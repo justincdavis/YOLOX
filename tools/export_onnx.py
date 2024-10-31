@@ -54,6 +54,11 @@ def make_parser():
         action="store_true",
         help="decode in inference or not"
     )
+    parser.add_argument(
+        "--imgsz",
+        type=int,
+        help="Custom input size for the models.",
+    )
 
     return parser
 
@@ -86,7 +91,10 @@ def main():
     model.head.decode_in_inference = args.decode_in_inference
 
     logger.info("loading checkpoint done.")
-    dummy_input = torch.randn(args.batch_size, 3, exp.test_size[0], exp.test_size[1])
+    if args.imgsz:
+        dummy_input = torch.randn(args.batch_size, 3, args.imgsz, args.imgsz)
+    else:
+        dummy_input = torch.randn(args.batch_size, 3, exp.test_size[0], exp.test_size[1])
 
     torch.onnx._export(
         model,
